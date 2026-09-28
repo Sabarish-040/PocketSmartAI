@@ -1,0 +1,30 @@
+{% extends "base.html %}
+
+{% block content %}
+<section>
+ <h1>Dashboard</h1>
+ <p>Choose a planner to create your personalized budget plan.</p>
+
+ <div class=cards>
+ <div class=card>
+ <h2>?? Home Planner</h2>
+ <p>Plan your home within your budget.</p>
+ <a class=button href=/planner/home>Open Planner</a>
+ </div>
+
+ <div class=card>
+ <h2>?? Party Planner</h2>
+ <p>Plan your party expenses and requirements.</p>
+ <a class=button href=/planner/party>Open Planner</a>
+ </div>
+
+ <div class=card>
+ <h2>?? Jewelry Planner</h2>
+ <p>Create a simple jewelry shopping plan.</p>
+ <a class=button href=/planner/jewelry>Open Planner</a>
+ </div>
+ </div>
+
+ <p><a href=/history>View Recommendation History</a></p>
+</section>
+{% endblock %}

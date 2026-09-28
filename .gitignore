@@ -1,0 +1,10 @@
+.venv/
+_pycache_/
+*.py[cod]
+.pytest_cache/
+.env
+pocketsmart.db
+test_pocketsmart.db
+uploads/
+.vscode/
+.DS_Store

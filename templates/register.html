@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth">
+    <h1>Create Account</h1>
+
+    <form id="registerForm">
+        <label for="name">Name</label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            required
+        >
+
+        <label for="email">Email</label>
+        <input
+            type="email"
+            id="email"
+            name="email"
+            required
+        >
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            name="password"
+            required
+        >
+
+        <button class="button" type="submit">Register</button>
+    </form>
+
+    <p id="message"></p>
+
+    <p>
+        Already have an account?
+        <a href="/login">Login</a>
+    </p>
+</section>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
+
+    message.textContent = "Creating account...";
+
+    try {
+        const response = await fetch("/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            message.textContent = "Error: " + (data.detail || "Registration failed");
+            return;
+        }
+
+        localStorage.setItem("access_token", data.access_token);
+
+        message.textContent = "Registration successful!";
+
+        window.location.href = "/planner/home";
+
+    } catch (error) {
+        message.textContent = "Server error: " + error.message;
+    }
+});
+</script>
+{% endblock %}

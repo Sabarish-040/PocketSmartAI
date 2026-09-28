@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="planner">
+
+    <h1>{{ planner|title }} Planner</h1>
+
+    <p>Enter your details and let PocketSmart AI create a personalized budget plan.</p>
+
+    <form id="plannerForm">
+
+        <label for="budget">Budget</label>
+        <input
+            type="number"
+            id="budget"
+            min="1"
+            placeholder="50000"
+            required
+        >
+
+        {% if planner == "home" %}
+
+        <label for="room">Room</label>
+        <input
+            type="text"
+            id="room"
+            placeholder="Living room"
+            required
+        >
+
+        <label for="style">Style</label>
+        <input
+            type="text"
+            id="style"
+            value="modern"
+        >
+
+        <label for="items">Items</label>
+        <input
+            type="text"
+            id="items"
+            value="lights, ceiling fan, decor"
+        >
+
+        {% elif planner == "party" %}
+
+        <label for="guests">Guests</label>
+        <input
+            type="number"
+            id="guests"
+            min="1"
+            required
+        >
+
+        <label for="event_type">Event Type</label>
+        <input
+            type="text"
+            id="event_type"
+            placeholder="Birthday"
+            required
+        >
+
+        <label for="venue">Venue</label>
+        <input
+            type="text"
+            id="venue"
+            value="flexible"
+        >
+
+        {% elif planner == "jewelry" %}
+
+        <label for="occasion">Occasion</label>
+        <input
+            type="text"
+            id="occasion"
+            placeholder="Wedding"
+            required
+        >
+
+        <label for="jewelry_type">Jewelry Type</label>
+        <input
+            type="text"
+            id="jewelry_type"
+            placeholder="Necklace"
+            required
+        >
+
+        {% endif %}
+
+        <button
+            class="button"
+            type="button"
+            onclick="generatePlan()"
+        >
+            Generate Plan
+        </button>
+
+    </form>
+
+    <div id="result" class="result"></div>
+
+</section>
+
+
+<script>
+
+async function generatePlan() {
+
+    const result = document.getElementById("result");
+
+    const budget =
+        Number(document.getElementById("budget").value);
+
+    if (!budget) {
+        result.innerHTML =
+            "<p>Please enter a valid budget.</p>";
+        return;
+    }
+
+    result.innerHTML =
+        "<p>Generating your personalized plan...</p>";
+
+    try {
+
+        let url = "";
+        let body = {};
+
+        {% if planner == "home" %}
+
+        url = "/api/planner/home";
+
+        body = {
+            budget: budget,
+            room: document.getElementById("room").value,
+            style: document.getElementById("style").value,
+            items: document.getElementById("items").value
+        };
+
+        {% elif planner == "party" %}
+
+        url = "/api/planner/party";
+
+        body = {
+            budget: budget,
+            guests: Number(
+                document.getElementById("guests").value
+            ),
+            event_type:
+                document.getElementById("event_type").value,
+            venue:
+                document.getElementById("venue").value
+        };
+
+        {% elif planner == "jewelry" %}
+
+        url = "/api/planner/jewelry";
+
+        body = {
+            budget: budget,
+            occasion:
+                document.getElementById("occasion").value,
+            jewelry_type:
+                document.getElementById("jewelry_type").value
+        };
+
+        {% endif %}
+
+
+        const response = await fetch(url, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            credentials: "include",
+
+            body: JSON.stringify(body)
+        });
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            result.innerHTML =
+                "<p><strong>Error:</strong> " +
+                (data.detail || "Request failed") +
+                "</p>";
+
+            return;
+        }
+
+
+        displayPlan(data);
+
+    } catch (error) {
+
+        result.innerHTML =
+            "<p><strong>Error:</strong> " +
+            error.message +
+            "</p>";
+    }
+}
+
+
+/* Display the generated plan */
+
+function displayPlan(data) {
+
+    const result =
+        document.getElementById("result");
+
+    let html = "";
+
+
+    /* Summary */
+
+    if (data.summary) {
+
+        html += `
+            <div class="plan-card">
+                <h2>Plan Summary</h2>
+                <p>${escapeHtml(data.summary)}</p>
+            </div>
+        `;
+    }
+
+
+    /* Budget allocation */
+
+    if (data.allocation) {
+
+        html += `
+            <div class="plan-card">
+                <h2>Budget Allocation</h2>
+                <div class="allocation-grid">
+        `;
+
+
+        for (const [category, amount]
+            of Object.entries(data.allocation)) {
+
+            html += `
+                <div class="allocation-item">
+                    <strong>${escapeHtml(category)}</strong>
+                    <span>₹${Number(amount).toLocaleString("en-IN")}</span>
+                </div>
+            `;
+        }
+
+
+        html += `
+                </div>
+            </div>
+        `;
+    }
+
+
+    /* Recommendations */
+
+    if (
+        data.recommendations &&
+        Array.isArray(data.recommendations)
+    ) {
+
+        html += `
+            <div class="plan-card">
+                <h2>Recommendations</h2>
+                <div class="recommendations">
+        `;
+
+
+        data.recommendations.forEach(item => {
+
+            html += `
+                <div class="recommendation-card">
+
+                    <h3>
+                        ${escapeHtml(item.name || "Recommendation")}
+                    </h3>
+
+                    ${
+                        item.category
+                        ? `<p><strong>Category:</strong>
+                           ${escapeHtml(item.category)}</p>`
+                        : ""
+                    }
+
+                    ${
+                        item.estimated_price !== undefined
+                        ? `<p><strong>Estimated price:</strong>
+                           ₹${Number(item.estimated_price)
+                              .toLocaleString("en-IN")}</p>`
+                        : ""
+                    }
+
+                    ${
+                        item.platform
+                        ? `<p><strong>Platform:</strong>
+                           ${escapeHtml(item.platform)}</p>`
+                        : ""
+                    }
+
+                    ${
+                        item.reason
+                        ? `<p>${escapeHtml(item.reason)}</p>`
+                        : ""
+                    }
+
+                    ${
+                        item.url && item.url !== "#"
+                        ? `<a href="${escapeAttribute(item.url)}"
+                              target="_blank"
+                              rel="noopener">
+                              View product
+                           </a>`
+                        : ""
+                    }
+
+                </div>
+            `;
+        });
+
+
+        html += `
+                </div>
+            </div>
+        `;
+    }
+
+
+    /* Disclaimer */
+
+    if (data.disclaimer) {
+
+        html += `
+            <div class="plan-disclaimer">
+                ${escapeHtml(data.disclaimer)}
+            </div>
+        `;
+    }
+
+
+    /* Fallback */
+
+    if (!html) {
+
+        html = `
+            <div class="plan-card">
+                <h2>Your Plan</h2>
+                <p>No formatted results were returned.</p>
+            </div>
+        `;
+    }
+
+
+    result.innerHTML = html;
+}
+
+
+/* Security helpers */
+
+function escapeHtml(value) {
+
+    const div = document.createElement("div");
+
+    div.textContent =
+        String(value ?? "");
+
+    return div.innerHTML;
+}
+
+
+function escapeAttribute(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+</script>
+
+{% endblock %}

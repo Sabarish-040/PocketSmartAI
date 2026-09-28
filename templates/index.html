@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-content">
+        <p class="eyebrow">AI-Powered Smart Planning</p>
+
+        <h1>Plan smarter with PocketSmart AI</h1>
+
+        <p>
+            Create practical budget plans and get personalized
+            recommendations for your home, parties, and jewelry.
+        </p>
+
+        <div class="hero-actions">
+            <a href="/register" class="btn btn-primary">
+                Get Started
+            </a>
+
+            <a href="/login" class="btn btn-secondary">
+                Login
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="cards-section">
+    <div class="section-heading">
+        <p class="eyebrow">Smart Planners</p>
+        <h2>Choose what you want to plan</h2>
+    </div>
+
+    <div class="planner-grid">
+
+        <a href="/planner/home" class="planner-card">
+            <h3>🏠 Home Planner</h3>
+            <p>
+                Plan your home setup according to your room,
+                style, items, and budget.
+            </p>
+        </a>
+
+        <a href="/planner/party" class="planner-card">
+            <h3>🎉 Party Planner</h3>
+            <p>
+                Organize your event budget for guests,
+                food, decoration, and venue.
+            </p>
+        </a>
+
+        <a href="/planner/jewelry" class="planner-card">
+            <h3>💎 Jewelry Planner</h3>
+            <p>
+                Build a jewelry shopping plan based on
+                your available budget.
+            </p>
+        </a>
+
+    </div>
+</section>
+
+<section class="info-section">
+    <h2>Why PocketSmart AI?</h2>
+
+    <div class="info-grid">
+        <div>
+            <h3>Smart Recommendations</h3>
+            <p>
+                Get recommendations designed around your budget.
+            </p>
+        </div>
+
+        <div>
+            <h3>Budget Friendly</h3>
+            <p>
+                See how your budget can be divided across different needs.
+            </p>
+        </div>
+
+        <div>
+            <h3>Recommendation History</h3>
+            <p>
+                Keep track of plans you have created.
+            </p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
